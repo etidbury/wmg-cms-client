@@ -1,20 +1,25 @@
 <?php
+//echo "<pre>";
+//print_r($_SERVER);echo "</pre>";die();
+//print_r(scandir('/var/www/html/'));
 try {
+
+    require_once "polyfill.php";
+    require_once "error.php";
 
 
     if (!isset($config) || !isset($config['PROJECT'])) throw new Exception("\$config['PROJECT'] has not been set in index.php");
 
     $isDevMode = isset($_GET['dev']);
 
-    $PROJECT_BASE_DIR = "";
+    $PROJECT_BASE_DIR = $_SERVER['DOCUMENT_ROOT'] . "/";
 
-    $SPACE_LIB_JS_URL = "http://localhost:9007/index.js";
+    $SPACE_LIB_JS_URL = "https://cdn.jsdelivr.net/gh/etidbury/spacecms@v0.0.34/index.js";
     $PROJECT_NAME = $config['PROJECT'];
     $EMBED_GLOBAL_NAME = "__spacecms_global";
     $INJECT_AFTER_ANCHOR_REFERENCE = "<head>";
-    $EMBED_HEAD_SNIPPET_FILE = "lib/embed-head-snippet.html";
     $SPACE_DATA_PREFIX = "space";
-    $TWIG_VENDOR_DIR = '../vendor/autoload.php';
+    $TWIG_VENDOR_DIR = '/var/www/html/vendor/autoload.php';
 //error_reporting(E_ERROR | E_PARSE);
 
     if ($isDevMode) {
@@ -26,6 +31,9 @@ try {
         $uri = "index";
     else
         $uri = $_GET['uri'];
+
+
+
 
 
     /*
@@ -44,8 +52,7 @@ try {
 //require_once('/var/www/twig/autoload.php');
     require_once($TWIG_VENDOR_DIR);
 
-
-    $loader = new Twig_Loader_Filesystem("./");
+    $loader = new Twig_Loader_Filesystem(array('./', $PROJECT_BASE_DIR));
     $twig = new Twig_Environment($loader, array(
         //'cache' => 'cache',
         'debug' => $isDevMode,
@@ -99,11 +106,17 @@ try {
 
 //http://localhost:1337/project/paulweller.com/spaces
 
+
     $alts = array(
         //  '{uri}.php',
+        '{uri}/default.twig',
+        '{uri}/index.twig',
+        '{uri}default.twig',
+        '{uri}index.twig',
         '{uri}.html',
         '{uri}.twig',
         '{uri}.html.twig',
+        '{uri}'
     );
 
     $i = 0;
@@ -114,9 +127,23 @@ try {
 
     $requestedFile = "";
 
+    $uriNoExtension = $uri;
+    if (substr($uri,-1) === "/") {
+
+        $uriParts = explode('/', $uri);
+        $uriEndNoExtension = explode('.', $uriParts[count($uriParts) - 1]);
+        $uriEndNoExtension = $uriEndNoExtension[0];
+        $uriParts[count($uriParts) - 1] = $uriEndNoExtension;
+        $uriNoExtension = implode('/', $uriParts);
+
+        $uriNoExtension = rtrim($uriNoExtension, "/");
+    }
+
     for ($i = 0; $i < count($alts); $i++) {
-        $requestedFile = $PROJECT_BASE_DIR . str_replace('{uri}', $uri, $alts[$i]);
+        $requestedFile = str_replace('{uri}', $uriNoExtension, $alts[$i]);
+
         if (is_file($requestedFile)) {
+
             $foundFile = file_get_contents($requestedFile);
             break;
         } else {
@@ -162,15 +189,27 @@ try {
         echo str_replace($INJECT_AFTER_ANCHOR_REFERENCE, $INJECT_AFTER_ANCHOR_REFERENCE . $embedHeadSnippet, $pageHTML);
 
     } else {
-        for ($i = 0; $i < count($notFound); $i++) {
-            echo "Not found: " . $notFound[$i] . "<br/>";
+
+
+        if ($isDevMode) {
+
+            echo "<pre>";
+            for ($i = 0; $i < count($notFound); $i++) {
+                echo "[DEBUG] File not found: " . $notFound[$i] . "\n";
+            }
+            echo "</pre>";
+
+        } else {
+            printErrorPage();
         }
+
+
     }
 
-}catch (\Exception $e){
-    if ($isDevMode){
+} catch (\Exception $e) {
+    if ($isDevMode) {
         throw $e;
-    }else {
+    } else {
         echo $e->getMessage();
     }
 }

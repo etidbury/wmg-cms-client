@@ -1,5 +1,4 @@
 <IfModule mod_rewrite.c>
-#basic:    [htaccess dir]/[text]/     ->    [htaccess dir]/index.php?text=[text]
 
 Options Indexes FollowSymLinks
 
@@ -8,13 +7,19 @@ Require all granted
 Options +FollowSymLinks
 RewriteEngine On
 
+#used only for dev env
+#RewriteBase /test-project
+DirectoryIndex index.php index.html index.htm
+#Options +Indexes
 
-RewriteBase /
 
-
-RewriteRule ^(.*)\.html$ "index.php?uri=$1"  [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{REQUEST_URI} !\.(jpg|png|css|js|php|webm|mp3|ogv|mov|mp4|avi|gif|pdf|xml|txt|doc|docx|ogg|wav)$
+#RewriteCond %{REQUEST_URI} \.(html|htm|php)$
 #RewriteRule ^(.*)$ "index.php?uri=$1"  [L]
-
+#RewriteRule ^(.*)$ index.php?uri=$1 [NC,L,QSA]
+RewriteRule ^(.*)$ /var/www/html/index.php?uri=$1 [NC,L,QSA]
 #for accepting slashes in [text]
 #RewriteRule ^([-a-zA-Z-0-9\s\/]+)*/$ ./index.php?text=$1
 
