@@ -14,12 +14,13 @@ try {
 
     $PROJECT_BASE_DIR = $_SERVER['DOCUMENT_ROOT'] . "/";
 
-    $SPACE_LIB_JS_URL = "https://cdn.jsdelivr.net/gh/etidbury/spacecms@v0.0.34/index.js";
+
+    $SPACE_LIB_JS_URL = "https://cdn.jsdelivr.net/gh/etidbury/spacecms@latest/index.js";
     $PROJECT_NAME = $config['PROJECT'];
     $EMBED_GLOBAL_NAME = "__spacecms_global";
     $INJECT_AFTER_ANCHOR_REFERENCE = "<head>";
     $SPACE_DATA_PREFIX = "space";
-    $TWIG_VENDOR_DIR = '/var/www/html/vendor/autoload.php';
+    $TWIG_VENDOR_DIR = '/var/www/twig/autoload.php';
 //error_reporting(E_ERROR | E_PARSE);
 
     if ($isDevMode) {
