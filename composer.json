@@ -1,0 +1,12 @@
+{
+    "name": "root/wmg-cms-client.git",
+    "authors": [
+        {
+            "name": "etidbury",
+            "email": "tidbury@live.com"
+        }
+    ],
+    "require": {
+        "twig/twig": "^2.4"
+    }
+}

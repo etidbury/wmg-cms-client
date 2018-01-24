@@ -1,0 +1,21 @@
+<IfModule mod_rewrite.c>
+#basic:    [htaccess dir]/[text]/     ->    [htaccess dir]/index.php?text=[text]
+
+Options Indexes FollowSymLinks
+
+Require all granted
+
+Options +FollowSymLinks
+RewriteEngine On
+
+
+RewriteBase /
+
+
+RewriteRule ^(.*)\.html$ "index.php?uri=$1"  [L]
+#RewriteRule ^(.*)$ "index.php?uri=$1"  [L]
+
+#for accepting slashes in [text]
+#RewriteRule ^([-a-zA-Z-0-9\s\/]+)*/$ ./index.php?text=$1
+
+</IfModule>
